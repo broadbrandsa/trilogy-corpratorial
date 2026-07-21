@@ -1,0 +1,5 @@
+.env.local
+.veo-tmp
+scripts
+public/img/*.credit.json
+public/img/_contactsheet.html

@@ -1,0 +1,363 @@
+@import "tailwindcss";
+
+@theme {
+  /* Trilogy brand system, from the logo pack. The green is the single
+     accent and must never be recoloured. */
+  --color-ink: #0a0a0a;
+  --color-green: #2fe85c;
+  --color-paper: #f7f5f0;
+  --color-bone: #ece9e2;
+  --color-stone: #5b5a55;
+
+  /* Warmth direction: warm paper + deep forest green. */
+  --color-cream: #fbf8f3;
+  --color-sand: #f3ece1;
+  --color-warmink: #20201c;
+  --color-forest: #15473a;
+  --color-forest-deep: #0f3429;
+
+  /* Corporate direction: white + navy slate + a deeper, calmer green. */
+  --color-navy: #0e1b2a;
+  --color-deepgreen: #0e7c46;
+  --color-mist: #f4f7f9;
+
+  --font-sans: var(--font-archivo), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Subtle rise-in used across all directions. Driven by IntersectionObserver
+   adding .is-in (see RevealManager); falls back to visible if JS never runs. */
+.rise {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s cubic-bezier(0.16, 0.84, 0.44, 1),
+    transform 0.7s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.rise.is-in {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile responsiveness. The pages use inline styles (no media queries), so
+   these classes override the inline desktop grids at small widths via
+   !important. Applied to the relevant grid containers across the directions.
+   --------------------------------------------------------------------------- */
+/* Stack the two/three-column layouts (hero, offering panels, AI demo, team,
+   Cape Town) on tablet and below. Targets the inline grids by their rendered
+   style value so no per-element class is needed. */
+@media (max-width: 900px) {
+  [style*="grid-template-columns:1.1fr .9fr"],
+  [style*="grid-template-columns:1.15fr .85fr"],
+  [style*="grid-template-columns:1.05fr 0.95fr"],
+  [style*="grid-template-columns:1.15fr 0.85fr"],
+  [style*="grid-template-columns:.9fr 2fr"],
+  [style*="grid-template-columns:1.5fr 1fr"],
+  [style*="grid-template-columns:1fr 1.1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  /* corporate hero text cell: drop the divider + tighten padding when stacked */
+  [style*="padding:104px 56px 96px 28px"] {
+    padding: 72px 24px 48px !important;
+    border-right: none !important;
+  }
+}
+@media (max-width: 760px) {
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns:repeat(3,1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+  [style*="grid-template-columns:repeat(4,1fr)"],
+  [style*="grid-template-columns:repeat(4, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .t-nav {
+    display: none !important;
+  }
+}
+@media (max-width: 600px) {
+  [style*="minmax(160px, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (max-width: 520px) {
+  [style*="grid-template-columns:repeat(4,1fr)"],
+  [style*="grid-template-columns:repeat(4, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* People cards: unify the varied headshots with a subtle grayscale that
+   restores to colour on hover. */
+.person-photo {
+  filter: grayscale(1) contrast(1.03) brightness(0.98);
+  transition: filter 0.45s ease, transform 0.45s ease;
+}
+.person-card:hover .person-photo {
+  filter: grayscale(0) contrast(1) brightness(1);
+  transform: scale(1.03);
+}
+
+/* ----- Micro-animation keyframes, shared by the interactive islands ----- */
+@keyframes trilogy-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.55);
+    opacity: 0.45;
+  }
+}
+@keyframes trilogy-msgin {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes trilogy-typed {
+  0% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+}
+@keyframes trilogy-chip {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes trilogy-offerin {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes trilogy-underline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes trilogy-floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-pulse,
+  .anim-floaty {
+    animation: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Motion direction: scroll-driven, kinetic (hugo-style). All reduced-motion
+   safe: words/parallax/lift collapse to static when reduced motion is set.
+   --------------------------------------------------------------------------- */
+
+/* Line-by-line word reveal: words rise from behind a mask when the parent
+   .rise enters view (RevealManager toggles .is-in). Stagger via inline delay. */
+.kin-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.kin-word {
+  display: inline-block;
+  transform: translateY(118%);
+  transition: transform 0.85s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.rise.is-in .kin-word {
+  transform: none;
+}
+
+/* Reverse + slower marquee variants (base keyframe defined above). */
+.trilogy-marquee-rev {
+  animation: trilogy-marquee 30s linear infinite reverse;
+}
+
+/* Hover lift for kinetic cards. */
+.lift {
+  transition: transform 0.45s cubic-bezier(0.16, 0.84, 0.44, 1),
+    box-shadow 0.45s ease, border-color 0.45s ease;
+  will-change: transform;
+}
+.lift:hover {
+  transform: translateY(-8px);
+}
+
+/* Scroll-linked parallax + reveal where the browser supports scroll timelines;
+   a no-op everywhere else (content stays put, already visible). */
+@keyframes trilogy-paraup {
+  from {
+    transform: translateY(48px);
+  }
+  to {
+    transform: translateY(-48px);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .parallax-up {
+      animation: trilogy-paraup linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kin-word {
+    transform: none;
+    transition: none;
+  }
+  .trilogy-marquee-rev {
+    animation: none;
+  }
+  .lift:hover {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Top-nav microinteractions: animated underline + colour shift on the menu
+   links, and a subtle lift on the primary CTA. Reduced-motion safe.
+   --------------------------------------------------------------------------- */
+.nav-link {
+  position: relative;
+  transition: color 0.25s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1.5px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.32s cubic-bezier(0.16, 0.84, 0.44, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+.nav-acc-green:hover { color: #2fe85c; }
+.nav-acc-green::after { background: #2fe85c; }
+.nav-acc-forest:hover { color: #15473a; }
+.nav-acc-forest::after { background: #15473a; }
+.nav-acc-navy:hover { color: #0e7c46; }
+.nav-acc-navy::after { background: #0e7c46; }
+
+.nav-cta {
+  transition: transform 0.25s cubic-bezier(0.16, 0.84, 0.44, 1),
+    box-shadow 0.25s ease, filter 0.25s ease;
+}
+.nav-cta:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after { transition: none; }
+  .nav-cta:hover { transform: none; }
+}
+
+/* Corporate inner-page responsive: stack the AI table, award rows and footer. */
+@media (max-width: 760px) {
+  .t-aitable-head { display: none !important; }
+  .t-aitable-row { grid-template-columns: 1fr !important; }
+  .t-aitable-row > div { padding: 4px 20px !important; }
+  .t-aitable-row > div:first-child { padding-top: 18px !important; }
+  .t-aitable-row > div:last-child { padding-bottom: 18px !important; }
+  .t-award-row { grid-template-columns: 1fr !important; gap: 4px !important; }
+  .t-footer { grid-template-columns: 1fr !important; }
+}
+
+/* Brand-wall logo tiles: grayscale by default, full colour on hover. */
+.logo-tile img { filter: grayscale(1); opacity: 0.72; transition: filter 0.3s ease, opacity 0.3s ease; }
+.logo-tile:hover img { filter: none; opacity: 1; }
+@media (max-width: 760px) { .t-logo-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+@media (max-width: 460px) { .t-logo-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+
+/* Tight, card-less brand logo cloud. */
+.logo-cloud img { filter: grayscale(1); opacity: 0.62; transition: filter 0.3s ease, opacity 0.3s ease; }
+.logo-cloud:hover img { filter: none; opacity: 1; }
+
+/* Corporate home grids */
+@media (max-width: 900px) { .t-3 { grid-template-columns: repeat(2,1fr) !important; } .t-4 { grid-template-columns: repeat(2,1fr) !important; } }
+@media (max-width: 680px) { .t-2, .t-3, .t-4 { grid-template-columns: 1fr !important; } }
+
+/* Savings calculator: stack controls above results on small screens. */
+@media (max-width: 860px) { [data-calc] { grid-template-columns: 1fr !important; } }
+
+/* Tech-stack carousel: hide the horizontal scrollbar. */
+.stack-track::-webkit-scrollbar { display: none; }
+
+/* Corporate mobile menu: burger + panel appear only when the inline nav hides. */
+@media (max-width: 760px) {
+  .t-nav-burger { display: inline-flex !important; }
+  .t-nav-mobile { display: flex !important; }
+}
+
+/* Corporate offerings tabs: stack rail / copy / media on smaller screens. */
+@media (max-width: 900px) {
+  .t-offer-corp { grid-template-columns: 1fr !important; }
+  .t-offer-corp > div:first-child { border-right: none !important; border-bottom: 1px solid rgba(14, 27, 42, 0.1); }
+  .t-offer-corp-media { min-height: 260px !important; border-left: none !important; border-top: 1px solid rgba(14, 27, 42, 0.1); }
+}
