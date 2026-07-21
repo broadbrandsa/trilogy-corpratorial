@@ -7,7 +7,7 @@ import { CorpratorialHeader, CorpratorialFooter } from "@/components/Corpratoria
  * Trilogy Digital — content is taken verbatim from the client's
  * "Trilogy Digital Overview" document. Nothing on this page is sourced from
  * other pages of the site; only the visual styling (icons, animated stat
- * counters, cards, hover) has been designed around that copy.
+ * counters, cards, hover, timeline) has been designed around that copy.
  * Palette: white / navy #0E1B2A / deep-green #0E7C46, bright green #2FE85C on dark.
  */
 
@@ -207,22 +207,22 @@ function Icon({ name, size = 22 }: { name: string; size?: number }) {
   );
 }
 
-function FeaturedIcon({ name, dark = false }: { name: string; dark?: boolean }) {
+function FeaturedIcon({ name, dark = false, size = 48 }: { name: string; dark?: boolean; size?: number }) {
   return (
     <span
       style={{
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        width: 46,
-        height: 46,
+        width: size,
+        height: size,
         borderRadius: 12,
         flex: "none",
         background: dark ? "rgba(47,232,92,.12)" : "rgba(14,124,70,.09)",
         color: dark ? BRIGHT : GREEN,
       }}
     >
-      <Icon name={name} />
+      <Icon name={name} size={Math.round(size * 0.48)} />
     </span>
   );
 }
@@ -233,14 +233,14 @@ const mono = (extra?: React.CSSProperties): React.CSSProperties => ({
   ...extra,
 });
 
-const wrap: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", padding: "92px 28px" };
+const wrap: React.CSSProperties = { maxWidth: 1180, margin: "0 auto", padding: "104px 28px" };
 const h2Style = (onDark = false): React.CSSProperties => ({
-  margin: "16px 0 0",
+  margin: "18px 0 0",
   maxWidth: "22ch",
-  fontSize: "clamp(28px,3.8vw,46px)",
+  fontSize: "clamp(30px,4vw,48px)",
   fontWeight: 200,
-  lineHeight: 1.06,
-  letterSpacing: "-.02em",
+  lineHeight: 1.05,
+  letterSpacing: "-.025em",
   color: onDark ? "#fff" : INK,
   textWrap: "balance",
 });
@@ -248,7 +248,10 @@ const h2Style = (onDark = false): React.CSSProperties => ({
 function Head({ kicker, title, intro, onDark = false }: { kicker?: string; title: string; intro?: string; onDark?: boolean }) {
   return (
     <div className="rise">
-      {kicker ? <div style={mono({ fontSize: 13, letterSpacing: ".18em", color: onDark ? BRIGHT : GREEN })}>{kicker}</div> : null}
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <span aria-hidden style={{ width: 30, height: 2, borderRadius: 2, background: onDark ? BRIGHT : GREEN }} />
+        {kicker ? <div style={mono({ fontSize: 13, letterSpacing: ".2em", color: onDark ? BRIGHT : GREEN })}>{kicker}</div> : null}
+      </div>
       <h2 style={h2Style(onDark)}>{title}</h2>
       {intro ? (
         <p style={{ margin: "22px 0 0", maxWidth: "62ch", fontSize: 16.5, fontWeight: 300, lineHeight: 1.7, color: onDark ? "rgba(255,255,255,.72)" : MUTED }}>{intro}</p>
@@ -257,19 +260,50 @@ function Head({ kicker, title, intro, onDark = false }: { kicker?: string; title
   );
 }
 
-// Page-local responsive grids + card hover (styling only).
+// Page-local layout + interaction styling (styling only; no copy).
 const pageCss = `
-.td-overview { display: grid; grid-template-columns: repeat(3,1fr); gap: 28px; }
-.td-do { display: grid; grid-template-columns: repeat(5,1fr); gap: 14px; }
+.td-overview { display:grid; grid-template-columns:1fr 1fr; gap:28px 44px; }
+.td-why { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.td-do { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+.td-offer { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.td-ai { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+.td-check { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.td-stats { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid rgba(14,27,42,.1); border-radius:16px; overflow:hidden; background:#fff; }
+.td-stats > div { padding:30px 26px; border-left:1px solid rgba(14,27,42,.1); }
+.td-stats > div:first-child { border-left:none; }
+
 .td-card { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.td-card:hover { border-color: rgba(14,124,70,.4); }
+.td-ai .td-card:hover { border-color: rgba(47,232,92,.45); }
 @media (prefers-reduced-motion: no-preference) {
-  .td-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(14,27,42,.1); }
+  .td-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(14,27,42,.10); }
+  .td-ai .td-card:hover { box-shadow: 0 18px 40px rgba(0,0,0,.35); }
 }
-.td-site { transition: background .2s ease; }
+
+.td-site { position:relative; transition: background .2s ease; }
 .td-site:hover { background: rgba(14,124,70,.05); }
-@media (max-width: 900px) { .td-do { grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 760px) { .td-overview { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .td-do { grid-template-columns: 1fr; } }
+.td-site::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:#0E7C46; transform:scaleY(0); transform-origin:center; transition:transform .2s ease; }
+.td-site:hover::before { transform:scaleY(1); }
+
+.td-timeline { position:relative; margin-top:36px; padding-left:30px; }
+.td-timeline::before { content:""; position:absolute; left:5px; top:12px; bottom:12px; width:2px; background:rgba(14,124,70,.22); }
+.td-tl-item { position:relative; display:grid; grid-template-columns:160px 1fr; gap:24px; padding:22px 0; border-top:1px solid rgba(14,27,42,.1); }
+.td-tl-item:first-child { border-top:none; }
+.td-tl-dot { position:absolute; left:-30px; top:26px; width:12px; height:12px; border-radius:999px; background:#fff; border:2px solid #0E7C46; }
+
+@media (max-width:900px){ .td-do{grid-template-columns:repeat(2,1fr);} .td-ai{grid-template-columns:repeat(2,1fr);} .td-offer{grid-template-columns:1fr;} }
+@media (max-width:760px){
+  .td-overview{grid-template-columns:1fr;} .td-why{grid-template-columns:1fr;} .td-check{grid-template-columns:1fr;}
+  .td-stats{grid-template-columns:repeat(2,1fr);}
+  .td-stats > div{ border-left:none; }
+  .td-stats > div:nth-child(2){ border-left:1px solid rgba(14,27,42,.1); }
+  .td-stats > div:nth-child(4){ border-left:1px solid rgba(14,27,42,.1); }
+  .td-stats > div:nth-child(3), .td-stats > div:nth-child(4){ border-top:1px solid rgba(14,27,42,.1); }
+  .td-tl-item{ grid-template-columns:1fr; gap:6px; }
+}
+@media (max-width:560px){ .td-do{grid-template-columns:1fr;} .td-ai{grid-template-columns:1fr;} }
+@media (max-width:420px){ .td-stats{grid-template-columns:1fr;} .td-stats > div{border-left:none !important; border-top:1px solid rgba(14,27,42,.1);} .td-stats > div:first-child{border-top:none;} }
 `;
 
 export default function TrilogyDigitalPage() {
@@ -281,16 +315,20 @@ export default function TrilogyDigitalPage() {
 
       {/* hero */}
       <section style={{ position: "relative", zIndex: 10, background: INK, color: "#fff", overflow: "hidden" }}>
+        <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(58% 75% at 82% 8%, rgba(47,232,92,.12), transparent 60%)" }} />
         <span
           aria-hidden
           className="anim-floaty"
-          style={{ position: "absolute", right: "-8vw", top: "-6vh", zIndex: 0, userSelect: "none", pointerEvents: "none", fontFamily: "var(--font-mono)", fontSize: "40vw", lineHeight: 1, color: "rgba(255,255,255,.03)", animation: "trilogy-floaty 12s ease-in-out infinite" }}
+          style={{ position: "absolute", right: "-8vw", top: "-6vh", zIndex: 0, userSelect: "none", pointerEvents: "none", fontFamily: "var(--font-mono)", fontSize: "40vw", lineHeight: 1, color: "rgba(255,255,255,.035)", animation: "trilogy-floaty 12s ease-in-out infinite" }}
         >
           三
         </span>
-        <div style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto", padding: "128px 28px 104px" }}>
-          <div className="rise" style={mono({ fontSize: 13, letterSpacing: ".22em", color: BRIGHT })}>{td.tagline}</div>
-          <h1 className="rise" style={{ margin: "22px 0 0", maxWidth: "14ch", fontSize: "clamp(44px,8vw,92px)", fontWeight: 200, lineHeight: 0.98, letterSpacing: "-.03em", color: "#fff", textWrap: "balance" }}>
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 1180, margin: "0 auto", padding: "132px 28px 112px" }}>
+          <div className="rise" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span aria-hidden style={{ width: 30, height: 2, borderRadius: 2, background: BRIGHT }} />
+            <div style={mono({ fontSize: 13, letterSpacing: ".22em", color: BRIGHT })}>{td.tagline}</div>
+          </div>
+          <h1 className="rise" style={{ margin: "26px 0 0", maxWidth: "14ch", fontSize: "clamp(46px,8.5vw,96px)", fontWeight: 200, lineHeight: 0.96, letterSpacing: "-.035em", color: "#fff", textWrap: "balance" }}>
             Trilogy <span style={{ color: BRIGHT }}>Digital.</span>
           </h1>
         </div>
@@ -300,16 +338,19 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}` }}>
         <div style={wrap}>
           <Head title={td.overview.title} />
-          <div className="rise td-overview" style={{ marginTop: 40 }}>
-            {td.overview.body.map((p, i) => (
+          <p className="rise" style={{ margin: "36px 0 0", maxWidth: "68ch", fontSize: "clamp(18px,1.9vw,21px)", fontWeight: 300, lineHeight: 1.62, color: INK }}>
+            {td.overview.body[0]}
+          </p>
+          <div className="rise td-overview" style={{ marginTop: 32 }}>
+            {td.overview.body.slice(1).map((p, i) => (
               <p key={i} style={{ margin: 0, fontSize: 15.5, fontWeight: 300, lineHeight: 1.7, color: MUTED }}>{p}</p>
             ))}
           </div>
-          <div className="rise t-4" style={{ marginTop: 44, display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
+          <div className="rise td-stats" style={{ marginTop: 52 }}>
             {td.overview.stats.map((s) => (
-              <div key={s.label} className="td-card" style={{ borderRadius: 12, padding: "26px 22px", background: MIST, border: `1px solid ${BORDER}` }}>
-                <Counter value={s.value} style={{ ...mono({ fontSize: "clamp(22px,2.4vw,32px)", fontWeight: 700, letterSpacing: "-.02em", color: GREEN }), display: "block" }} />
-                <div style={{ marginTop: 10, fontSize: 13.5, lineHeight: 1.45, color: MUTED }}>{s.label}</div>
+              <div key={s.label}>
+                <Counter value={s.value} style={{ ...mono({ fontSize: "clamp(26px,3vw,40px)", fontWeight: 700, letterSpacing: "-.02em", color: GREEN }), display: "block" }} />
+                <div style={{ marginTop: 12, fontSize: 13.5, lineHeight: 1.45, color: MUTED }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -320,11 +361,11 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}`, background: MIST }}>
         <div style={wrap}>
           <Head kicker={td.why.kicker} title={td.why.title} />
-          <div className="rise t-2" style={{ marginTop: 40, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+          <div className="rise td-why" style={{ marginTop: 44 }}>
             {td.why.points.map((p, i) => (
-              <div key={p} className="td-card" style={{ display: "flex", gap: 18, alignItems: "flex-start", padding: 26, borderRadius: 14, background: "#fff", border: `1px solid ${BORDER}` }}>
+              <div key={p} className="td-card" style={{ display: "flex", gap: 20, alignItems: "flex-start", padding: 28, borderRadius: 16, background: "#fff", border: `1px solid ${BORDER}` }}>
                 <FeaturedIcon name={WHY_ICONS[i]} />
-                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: INK }}>{p}</p>
+                <p style={{ margin: 0, fontSize: 16, lineHeight: 1.62, color: INK }}>{p}</p>
               </div>
             ))}
           </div>
@@ -335,11 +376,11 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}` }}>
         <div style={wrap}>
           <Head title={td.whatWeDo.title} intro={td.whatWeDo.body} />
-          <div className="rise td-do" style={{ marginTop: 40 }}>
+          <div className="rise td-do" style={{ marginTop: 44 }}>
             {td.whatWeDo.points.map((p, i) => (
-              <div key={p} className="td-card" style={{ padding: 22, borderRadius: 14, background: MIST, border: `1px solid ${BORDER}` }}>
-                <span style={{ color: GREEN, display: "block" }}><Icon name={DO_ICONS[i]} size={24} /></span>
-                <div style={{ marginTop: 16, fontSize: 14.5, lineHeight: 1.55, color: INK }}>{p}</div>
+              <div key={p} className="td-card" style={{ display: "flex", flexDirection: "column", padding: 24, borderRadius: 16, background: MIST, border: `1px solid ${BORDER}` }}>
+                <FeaturedIcon name={DO_ICONS[i]} size={44} />
+                <div style={{ marginTop: 18, fontSize: 14.5, lineHeight: 1.55, color: INK }}>{p}</div>
               </div>
             ))}
           </div>
@@ -350,13 +391,13 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}`, background: MIST }}>
         <div style={wrap}>
           <Head title={td.footprint.title} />
-          <div className="rise" style={{ marginTop: 36, borderTop: `1px solid ${BORDER}` }}>
+          <div className="rise" style={{ marginTop: 40, borderTop: `1px solid ${BORDER}` }}>
             {td.footprint.sites.map((s, i) => (
-              <div key={s.name} className="td-site" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 24, alignItems: "baseline", padding: "22px 16px", borderBottom: `1px solid ${BORDER}` }}>
-                <div style={mono({ fontSize: 13, letterSpacing: ".06em", color: GREEN, fontWeight: 600 })}>{String(i + 1).padStart(2, "0")}</div>
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-                  <span style={{ fontSize: "clamp(19px,2.2vw,26px)", fontWeight: 400, letterSpacing: "-.01em", color: INK }}>{s.name}</span>
-                  <span style={{ fontSize: 14.5, color: MUTED }}>{s.detail}</span>
+              <div key={s.name} className="td-site" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 26, alignItems: "center", padding: "26px 20px", borderBottom: `1px solid ${BORDER}` }}>
+                <div style={mono({ fontSize: 26, fontWeight: 700, letterSpacing: "-.02em", color: "rgba(14,124,70,.3)", width: 40 })}>{String(i + 1).padStart(2, "0")}</div>
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+                  <span style={{ fontSize: "clamp(20px,2.2vw,27px)", fontWeight: 400, letterSpacing: "-.015em", color: INK }}>{s.name}</span>
+                  <span style={mono({ fontSize: 12, letterSpacing: ".08em", color: GREEN, background: "rgba(14,124,70,.08)", border: `1px solid rgba(14,124,70,.18)`, borderRadius: 999, padding: "6px 14px" })}>{s.detail}</span>
                 </div>
               </div>
             ))}
@@ -368,14 +409,14 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}` }}>
         <div style={wrap}>
           <Head title="Our Offerings" />
-          <div className="rise t-3" style={{ marginTop: 40, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
+          <div className="rise td-offer" style={{ marginTop: 44 }}>
             {td.offerings.map((o, i) => (
-              <div key={o.name} className="td-card" style={{ borderRadius: 14, overflow: "hidden", background: "#fff", border: `1px solid ${BORDER}`, borderTop: `3px solid ${GREEN}` }}>
-                <div style={{ padding: 28 }}>
-                  <div style={mono({ fontSize: 12, letterSpacing: ".14em", color: GREEN })}>{String(i + 1).padStart(2, "0")}</div>
-                  <h3 style={{ margin: "14px 0 0", fontSize: 22, fontWeight: 500, letterSpacing: "-.01em", color: INK }}>{o.name}</h3>
-                  <div style={{ marginTop: 6, fontSize: 15, fontWeight: 600, color: GREEN }}>{o.tagline}</div>
-                  <p style={{ margin: "14px 0 0", fontSize: 14.5, lineHeight: 1.65, color: MUTED }}>{o.body}</p>
+              <div key={o.name} className="td-card" style={{ position: "relative", borderRadius: 16, overflow: "hidden", background: "#fff", border: `1px solid ${BORDER}`, borderTop: `3px solid ${GREEN}` }}>
+                <div style={{ padding: "30px 28px 34px" }}>
+                  <div aria-hidden style={mono({ position: "absolute", top: 20, right: 24, fontSize: 44, fontWeight: 700, lineHeight: 1, color: "rgba(14,124,70,.1)" })}>{String(i + 1).padStart(2, "0")}</div>
+                  <h3 style={{ margin: 0, fontSize: 24, fontWeight: 500, letterSpacing: "-.015em", color: INK }}>{o.name}</h3>
+                  <div style={mono({ display: "inline-block", marginTop: 12, fontSize: 11.5, letterSpacing: ".1em", color: GREEN, background: "rgba(14,124,70,.08)", border: "1px solid rgba(14,124,70,.18)", borderRadius: 999, padding: "6px 12px" })}>{o.tagline}</div>
+                  <p style={{ margin: "18px 0 0", fontSize: 14.5, lineHeight: 1.65, color: MUTED }}>{o.body}</p>
                 </div>
               </div>
             ))}
@@ -384,14 +425,15 @@ export default function TrilogyDigitalPage() {
       </section>
 
       {/* proprietary AI suite — navy band */}
-      <section style={{ background: INK, color: "#fff" }}>
-        <div style={wrap}>
+      <section style={{ position: "relative", background: INK, color: "#fff", overflow: "hidden" }}>
+        <span aria-hidden style={{ position: "absolute", inset: 0, zIndex: 0, background: "radial-gradient(50% 60% at 15% 0%, rgba(47,232,92,.08), transparent 60%)" }} />
+        <div style={{ ...wrap, position: "relative", zIndex: 1 }}>
           <Head title={td.aiSuite.title} intro={td.aiSuite.intro} onDark />
-          <div className="rise t-3" style={{ marginTop: 44, display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16 }}>
+          <div className="rise td-ai" style={{ marginTop: 48 }}>
             {td.aiSuite.platforms.map((p, i) => (
-              <div key={p.name} className="td-card" style={{ borderRadius: 14, padding: 24, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.14)" }}>
+              <div key={p.name} className="td-card" style={{ borderRadius: 16, padding: 26, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.14)" }}>
                 <FeaturedIcon name={AI_ICONS[i]} dark />
-                <div style={mono({ marginTop: 16, fontSize: 16, letterSpacing: ".01em", color: BRIGHT, textTransform: "none", fontWeight: 600 })}>{p.name}</div>
+                <div style={mono({ marginTop: 18, fontSize: 16, letterSpacing: ".01em", color: BRIGHT, textTransform: "none", fontWeight: 600 })}>{p.name}</div>
                 <p style={{ margin: "10px 0 0", fontSize: 14.5, lineHeight: 1.6, color: "rgba(255,255,255,.72)" }}>{p.body}</p>
               </div>
             ))}
@@ -403,14 +445,14 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}` }}>
         <div style={wrap}>
           <Head title={td.security.title} intro={td.security.body} />
-          <ul className="rise" style={{ listStyle: "none", margin: "36px 0 0", padding: 0, display: "flex", flexDirection: "column", gap: 0 }}>
-            {td.security.points.map((p, i) => (
-              <li key={p} style={{ display: "flex", gap: 14, alignItems: "center", padding: "16px 0", borderTop: i === 0 ? "none" : `1px solid ${BORDER}`, fontSize: 15.5, lineHeight: 1.5, color: INK }}>
-                <span style={{ flex: "none", color: GREEN }}><Icon name="shield" size={20} /></span>
-                {p}
-              </li>
+          <div className="rise td-check" style={{ marginTop: 44 }}>
+            {td.security.points.map((p) => (
+              <div key={p} className="td-card" style={{ display: "flex", gap: 16, alignItems: "center", padding: "20px 22px", borderRadius: 14, background: MIST, border: `1px solid ${BORDER}` }}>
+                <FeaturedIcon name="shield" size={40} />
+                <span style={{ fontSize: 15.5, lineHeight: 1.5, color: INK }}>{p}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
@@ -418,9 +460,10 @@ export default function TrilogyDigitalPage() {
       <section style={{ borderTop: `1px solid ${BORDER}`, background: MIST }}>
         <div style={wrap}>
           <Head title="Awards" />
-          <div className="rise" style={{ marginTop: 32, display: "grid", gap: 0 }}>
+          <div className="rise td-timeline">
             {td.awards.map((a) => (
-              <div key={a.year} className="t-award-row" style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 24, padding: "18px 0", borderTop: `1px solid ${BORDER}` }}>
+              <div key={a.year} className="td-tl-item">
+                <span aria-hidden className="td-tl-dot" />
                 <div style={mono({ fontSize: 14, letterSpacing: ".06em", color: GREEN, fontWeight: 600 })}>{a.year}</div>
                 <div style={{ fontSize: 14.5, lineHeight: 1.6, color: MUTED }}>{a.items}</div>
               </div>
